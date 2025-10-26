@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datenschutzerklärung</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        <img src="{{ url_for('static', filename='logo.png') }}" 
+     alt="logo"
+     style="width:100px; border-radius:10px;">
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #444;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Deine Privatsphäre ist uns wichtig</h1>
+
+        <p>Bitte akzeptiere unsere AGB</p>
+        <p>
+            Indem du auf alle akzeptieren klickst erklärst du dich damit einverstanden, dass deine Daten gespeichert werden.
+        </p>
+
+        <p>Mit einem Klick auf „alle akzeptieren“ erklärst du dich damit einverstanden.</p>
+
+        <button id="agreeBtn">alle akzeptieren</button>
+        <div class="message" id="msg"></div>
+    </div>
+
+    <script>
+        document.getElementById("agreeBtn").addEventListener("click", async () => {
+            const msg = document.getElementById("msg");
+            msg.textContent = "Verarbeite Zustimmung...";
+
+            try {
+                const response = await fetch("/consent", { method: "POST" });
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem("consent_token", data.token);
+                    msg.textContent = "Zustimmung gespeichert! Du wirst weitergeleitet...";
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 1500);
+                } else {
+                    msg.textContent = "Fehler bei der Zustimmung.";
+                }
+            } catch (err) {
+                msg.textContent = "Netzwerkfehler. Bitte versuche es erneut.";
+            }
+        });
+    </script>
+</body>
+</html>
